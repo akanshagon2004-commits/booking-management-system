@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bookings List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar bg-dark vh-100 p-3 text-white position-fixed">
+            <h3 class="mb-4"><i class="fas fa-shield-alt"></i> Booking Mgmt</h3>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link text-white" th:href="@{/dashboard}"><i class="fas fa-home me-2"></i> Dashboard</a></li>
+
+                <li class="nav-item" th:if="${userRole != 'ROLE_CUSTOMER'}">
+                    <a class="nav-link text-white active" th:href="@{/bookings/list}"><i class="fas fa-list me-2"></i> Bookings</a>
+                </li>
+
+                <li class="nav-item"><a class="nav-link text-white" th:href="@{/bookings/add}"><i class="fas fa-plus-circle me-2"></i> Add Booking</a></li>
+                <li class="nav-item mt-5"><a class="nav-link text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-4 pt-4" style="margin-left: 16.6% !important;">
+            <div class="data-card shadow-sm p-4 bg-white rounded">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold">System Bookings</h4>
+                    <a th:href="@{/bookings/add}" class="btn btn-primary shadow-sm"><i class="fas fa-plus"></i> Add New Booking</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                        <tr><th>ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th>
+                            <th th:if="${userRole != 'ROLE_CUSTOMER'}">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="b : ${bookings}">
+                            <td class="fw-bold text-primary" th:text="${b.bookingId}"></td>
+                            <td th:text="${b.customerName}"></td>
+                            <td th:text="'₹' + ${b.amount}"></td>
+                            <td>
+                                <span th:class="'badge rounded-pill bg-' +
+                                    (${b.status.name() == 'APPROVED'} ? 'success' :
+                                    (${b.status.name() == 'REQUESTED'} ? 'info' : 'warning'))"
+                                      th:text="${b.status}"></span>
+                            </td>
+                            <td th:text="${#temporals.format(b.bookingDate, 'dd-MM-yyyy')}"></td>
+
+                            <td th:if="${userRole != 'ROLE_CUSTOMER'}">
+                                <a th:href="@{/bookings/edit/{id}(id=${b.id})}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+
+                                <a th:if="${userRole == 'ROLE_ADMIN'}"
+                                   th:href="@{/bookings/delete/{id}(id=${b.id})}"
+                                   class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Delete this booking?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>
